@@ -11,10 +11,6 @@ SDL_Renderer* renderer = NULL;
 int isRunning = false;
 int lastFrameTime = 0;
 
-int boxColorR = 255;
-int boxColorG = 255;
-int boxColorB = 255;
-
 //boid structure for placing boids
 struct boid {
 	float x;
@@ -23,6 +19,9 @@ struct boid {
 	float dy;
 	float width;
 	float height;
+	int r;
+	int g;
+	int b;
 }boids[numBoids];
 
 //Setup window and it's parameters
@@ -72,6 +71,19 @@ void setup() {
 	boids[0].dy = 3;
 	boids[0].width = 80;
 	boids[0].height = 60;
+	boids[0].r = 255;
+	boids[0].g = 255;
+	boids[0].b = 255;
+
+	boids[1].x = 500;
+	boids[1].y = 356;
+	boids[1].dx = -4.6;
+	boids[1].dy = 2;
+	boids[1].width = 80;
+	boids[1].height = 60;
+	boids[1].r = 255;
+	boids[1].g = 255;
+	boids[1].b = 255;
 }
 
 //Takes and processes inputs
@@ -108,17 +120,17 @@ void update() {
 		//If boid hits side edges
 		if (boids[i].x < 0 || boids[i].x >(windowWidth - boids[i].width)) {
 			boids[i].dx *= -1;
-			boxColorR = rand() % 256;
-			boxColorG = rand() % 256;
-			boxColorB = rand() % 256;
+			boids[i].r = rand() % 256;
+			boids[i].g = rand() % 256;
+			boids[i].b = rand() % 256;
 		}
 
 		//If boid hits side edges
 		if (boids[i].y < 0 || boids[i].y >(windowHeight - boids[i].height)) {
 			boids[i].dy *= -1;
-			boxColorR = rand() % 256;
-			boxColorG = rand() % 256;
-			boxColorB = rand() % 256;
+			boids[i].r = rand() % 256;
+			boids[i].g = rand() % 256;
+			boids[i].b = rand() % 256;
 		}
 
 		//Update boid pos
@@ -140,7 +152,7 @@ void render() {
 	for (int i = 0; i < numBoids; i++) {
 		SDL_Rect rectangle = { boids[i].x, boids[i].y, boids[i].width, boids[i].height };
 
-		SDL_SetRenderDrawColor(renderer, boxColorR, boxColorG, boxColorB, 255);
+		SDL_SetRenderDrawColor(renderer, boids[i].r, boids[i].g, boids[i].b, 255);
 		SDL_RenderFillRect(renderer, &rectangle);
 	}
 

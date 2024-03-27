@@ -7,4 +7,4 @@
 #define FPS 60
 #define targetFrameTime (1000/FPS)
 
-#define numBoids 1
+#define numBoids 2
