@@ -89,8 +89,9 @@ int processInput() {
 
 //Update objects every frame
 void update() {
-	if (ball.x >= windowWidth - ball.width) {
-		//todo
+	ball.x += 0.3;
+	if (ball.x >= windowWidth) {
+		ball.x = 0 - ball.width;
 	}
 }
 
