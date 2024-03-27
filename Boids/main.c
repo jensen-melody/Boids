@@ -1,21 +1,31 @@
 #include <stdio.h>
 #include <SDL.h>
+#include <time.h>
+#include <stdlib.h>
 #include "./constants.h"
+
+//Initialize rng
 
 //Global variables used for things :3
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
 int isRunning = false;
-int lr = 1;
+int lastFrameTime = 0;
 
-//ball structure for placing rectangles
-struct ball {
+int boxColorR = 255;
+int boxColorG = 255;
+int boxColorB = 255;
+
+//boid structure for placing rectangles
+struct boid {
 	float x;
 	float y;
+	float dx;
+	float dy;
 	float width;
 	float height;
-}ball;
+}boids[numBoids];
 
 //Setup window and it's parameters
 int initializeWindow(void) {
@@ -27,7 +37,7 @@ int initializeWindow(void) {
 
 	//Window variable setup
 	window = SDL_CreateWindow(
-		"Gay Sex", //Window Title
+		"Boids", //Window Title
 		SDL_WINDOWPOS_CENTERED, //Xpos
 		SDL_WINDOWPOS_CENTERED, //Ypos
 		windowWidth, //Width
@@ -57,31 +67,34 @@ int initializeWindow(void) {
 void setup() {
 	//TODO: Setup
 
-	//Sets ball variables
-	ball.x = 0;
-	ball.y = 0;
-	ball.width = 400;
-	ball.height = 600;
+	//Sets boid variables
+	boids[0].x = 0;
+	boids[0].y = 0;
+	boids[0].dx = 3;
+	boids[0].dy = 3;
+	boids[0].width = 80;
+	boids[0].height = 60;
 }
 
 //Takes and processes inputs
 int processInput() {
-	//init events
+	//Init events
 	SDL_Event event;
 	SDL_PollEvent(&event);
 
-	//check if certain keys are pressed
+	//Check if certain keys are pressed
 	switch (event.type) {
-		//if Exit, Alt+F4, or Win button is pressed
+		//If Exit, Alt+F4, or Win button is pressed
 		case SDL_QUIT: 
 			printf("Quit");
 			return false;
 			break;
-		//if X is pressed
+		//If X is pressed
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE)
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
 				printf("Esc");
 				return false;
+			}
 			break;
 
 	}
@@ -89,28 +102,53 @@ int processInput() {
 
 //Update objects every frame
 void update() {
-	ball.x += 0.3;
-	if (ball.x >= windowWidth) {
-		ball.x = 0 - ball.width;
+	//Fixed FPS stuff
+	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
+	lastFrameTime = SDL_GetTicks();
+
+	for (int i = 0; i < numBoids; i++) {
+		//If boid hits side edges
+		if (boids[i].x < 0 || boids[i].x >(windowWidth - boids[i].width)) {
+			boids[i].dx *= -1;
+			boxColorR = rand() % 256;
+			boxColorG = rand() % 256;
+			boxColorB = rand() % 256;
+		}
+
+		//If boid hits side edges
+		if (boids[i].y < 0 || boids[i].y >(windowHeight - boids[i].height)) {
+			boids[i].dy *= -1;
+			boxColorR = rand() % 256;
+			boxColorG = rand() % 256;
+			boxColorB = rand() % 256;
+		}
+
+		//Update boid pos
+		boids[i].x += boids[i].dx;
+		boids[i].y += boids[i].dy;
+
 	}
 }
+
 
 //Tell renderer to show objects on screen
 void render() {
 	//Draws background color
-	SDL_SetRenderDrawColor(renderer, 245, 169, 184, 255);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
 	//Clears screen
 	SDL_RenderClear(renderer);
 
 	//Draw Rectangle
-	SDL_Rect rectangle = { ball.x, ball.y, ball.width, ball.height };
+	for (int i = 0; i < numBoids; i++) {
+		SDL_Rect rectangle = { boids[i].x, boids[i].y, boids[i].width, boids[i].height};
 
-	SDL_SetRenderDrawColor(renderer, 91, 206, 250, 255);
-	SDL_RenderFillRect(renderer, &rectangle);
+		SDL_SetRenderDrawColor(renderer, boxColorR, boxColorG, boxColorB, 255);
+		SDL_RenderFillRect(renderer, &rectangle);
 
-	//Swap buffer frame for current frame (Draws frame)
-	SDL_RenderPresent(renderer);
+		//Swap buffer frame for current frame (Draws frame)
+		SDL_RenderPresent(renderer);
+	}
 }
 
 //Uninitializes everything in reverse order it initialized it
@@ -122,13 +160,20 @@ void destroyWindow() {
 
 //main function :D
 int main(int argc, char* argv[]) {
-	//set isRunning variable to true
+	//Initialize RNG
+	srand(time(NULL));
+
+	
+
+	//Set isRunning variable to true
 	int isRunning = initializeWindow();
 
 	setup();
 
 	//Main Game Loop
 	while (isRunning) {
+
+
 		isRunning = processInput();
 		update();
 		render();
