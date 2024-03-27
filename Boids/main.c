@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "./constants.h"
 
-//Initialize rng
-
 //Global variables used for things :3
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -17,7 +15,7 @@ int boxColorR = 255;
 int boxColorG = 255;
 int boxColorB = 255;
 
-//boid structure for placing rectangles
+//boid structure for placing boids
 struct boid {
 	float x;
 	float y;
@@ -130,7 +128,6 @@ void update() {
 	}
 }
 
-
 //Tell renderer to show objects on screen
 void render() {
 	//Draws background color
@@ -141,14 +138,14 @@ void render() {
 
 	//Draw Rectangle
 	for (int i = 0; i < numBoids; i++) {
-		SDL_Rect rectangle = { boids[i].x, boids[i].y, boids[i].width, boids[i].height};
+		SDL_Rect rectangle = { boids[i].x, boids[i].y, boids[i].width, boids[i].height };
 
 		SDL_SetRenderDrawColor(renderer, boxColorR, boxColorG, boxColorB, 255);
 		SDL_RenderFillRect(renderer, &rectangle);
+	}
 
 		//Swap buffer frame for current frame (Draws frame)
 		SDL_RenderPresent(renderer);
-	}
 }
 
 //Uninitializes everything in reverse order it initialized it
@@ -163,8 +160,6 @@ int main(int argc, char* argv[]) {
 	//Initialize RNG
 	srand(time(NULL));
 
-	
-
 	//Set isRunning variable to true
 	int isRunning = initializeWindow();
 
@@ -172,8 +167,6 @@ int main(int argc, char* argv[]) {
 
 	//Main Game Loop
 	while (isRunning) {
-
-
 		isRunning = processInput();
 		update();
 		render();
