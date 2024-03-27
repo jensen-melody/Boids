@@ -116,6 +116,7 @@ void update() {
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
 
+	//Do calculations for boid velocities
 	for (int i = 0; i < numBoids; i++) {
 		//If boid hits side edges
 		if (boids[i].x < 0 || boids[i].x >(windowWidth - boids[i].width)) {
@@ -132,11 +133,12 @@ void update() {
 			boids[i].g = rand() % 256;
 			boids[i].b = rand() % 256;
 		}
+	}
 
-		//Update boid pos
+	//Update boids pos
+	for (int i = 0; i < numBoids; i++) {
 		boids[i].x += boids[i].dx;
 		boids[i].y += boids[i].dy;
-
 	}
 }
 
