@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <time.h>
 #include <stdlib.h>
+#include <math.h>
 #include "./constants.h"
 
 //Global variables used for things :3
@@ -10,6 +11,10 @@ SDL_Renderer* renderer = NULL;
 
 int isRunning = false;
 int lastFrameTime = 0;
+
+SDL_Vertex vertex_1 = { {400, 50}, {255, 0, 0, 255}, {1, 1} };
+SDL_Vertex vertex_2 = { {200, 300}, {255, 0, 0, 255}, {1, 1} };
+SDL_Vertex vertex_3 = { {600, 300}, {255, 0, 0, 255}, {1, 1} };
 
 //boid structure for placing boids
 struct boid {
@@ -64,6 +69,7 @@ int initializeWindow(void) {
 void setup() {
 	//TODO: Setup
 
+	/*
 	//Sets boid variables
 	for (int i = 0; i < numBoids; i++) {
 		boids[i].width = 10;
@@ -82,6 +88,7 @@ void setup() {
 			boids[i].dy *= -1;
 		}
 	}
+	*/
 }
 
 //Takes and processes inputs
@@ -114,6 +121,7 @@ void update() {
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
 
+	/*
 	//Do calculations for boid velocities
 	for (int i = 0; i < numBoids; i++) {
 		//If boid hits side edges
@@ -138,26 +146,29 @@ void update() {
 		boids[i].x += boids[i].dx;
 		boids[i].y += boids[i].dy;
 	}
+	*/
 }
 
 //Tell renderer to show objects on screen
 void render() {
-	//Draws background color
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	//Draw background
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
-	//Clears screen
+	//Clear Screen
 	SDL_RenderClear(renderer);
 
-	//Draw Rectangle
-	for (int i = 0; i < numBoids; i++) {
-		SDL_Rect rectangle = { boids[i].x, boids[i].y, boids[i].width, boids[i].height };
+	// Put them into array
+	SDL_Vertex vertices[] = {
+		vertex_1,
+		vertex_2,
+		vertex_3
+	};
 
-		SDL_SetRenderDrawColor(renderer, boids[i].r, boids[i].g, boids[i].b, 255);
-		SDL_RenderFillRect(renderer, &rectangle);
-	}
+	// Render red triangle
+	SDL_RenderGeometry(renderer,NULL, vertices, 3, NULL, 0);
 
-		//Swap buffer frame for current frame (Draws frame)
-		SDL_RenderPresent(renderer);
+	//Swap buffer frame for current frame (Draws frame)
+	SDL_RenderPresent(renderer);
 }
 
 //Uninitializes everything in reverse order it initialized it
