@@ -17,8 +17,8 @@ struct boid {
 	float y;
 	float dx;
 	float dy;
-	float width;
-	float height;
+	int width;
+	int height;
 	int r;
 	int g;
 	int b;
@@ -65,25 +65,23 @@ void setup() {
 	//TODO: Setup
 
 	//Sets boid variables
-	boids[0].x = 0;
-	boids[0].y = 0;
-	boids[0].dx = 3;
-	boids[0].dy = 3;
-	boids[0].width = 80;
-	boids[0].height = 60;
-	boids[0].r = 255;
-	boids[0].g = 255;
-	boids[0].b = 255;
-
-	boids[1].x = 500;
-	boids[1].y = 356;
-	boids[1].dx = -4.6;
-	boids[1].dy = 2;
-	boids[1].width = 80;
-	boids[1].height = 60;
-	boids[1].r = 255;
-	boids[1].g = 255;
-	boids[1].b = 255;
+	for (int i = 0; i < numBoids; i++) {
+		boids[i].width = 10;
+		boids[i].height = 10;
+		boids[i].x = rand() % (windowWidth - boids[i].width);
+		boids[i].y = rand() % (windowHeight - boids[i].height);
+		boids[i].dx = (((rand() % 40) + 20) / 10);
+		if (rand() % 2 == 1) {
+			boids[i].dx *= -1;
+		}
+		boids[i].dy = ((rand() % 40) + 20) / 10;
+		boids[i].r = 255;
+		boids[i].g = 255;
+		boids[i].b = 255;
+		if (rand() % 2 == 0) {
+			boids[i].dy *= -1;
+		}
+	}
 }
 
 //Takes and processes inputs
@@ -173,6 +171,9 @@ void destroyWindow() {
 int main(int argc, char* argv[]) {
 	//Initialize RNG
 	srand(time(NULL));
+
+	//Get fullscreen size
+	//SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
 
 	//Set isRunning variable to true
 	int isRunning = initializeWindow();
