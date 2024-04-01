@@ -14,46 +14,34 @@ int lastFrameTime = 0;
 
 boid boids[numBoids];
 
-SDL_Vertex vface = { {300,250}, {255,255,255,255}, {1,1} };
-SDL_Vertex vlWing = { {250,300}, {255,255,255,255}, {1,1} };
-SDL_Vertex vrWing = { {350,300}, {255,255,255,255}, {1,1} };
-SDL_Vertex vtail = { {300,275}, {255,255,255,255}, {1,1} };
+void calcVertecies(boid boid[], int i, float r) {
+	//get center variables
+	vector2 center = boid[i].pos;
 
-void calcVertecies(boid boid, float r) {
-	//position variables
-	vector2 center = boid.pos;
+	//Get r from velocity
+	r = r;
 
 	vector2 face;
-	face.x = center.x;
-	face.y = center.y + (1 * boidSize); \
+	face.x = (sin(r) + center.x) * boidSize;
+	face.y = (cos(r) + center.y) * boidSize;
 
-		vector2 lwing;
-	lwing.x = center.x + (-1 * boidSize);
-	lwing.y = center.y + (-1 * boidSize);
+	vector2 lWing;
+	lWing.x = (-cos(r) - sin(r) + center.x) * boidSize;
+	lWing.y = (sin(r) - cos(r) + center.y) * boidSize;
 
-	vector2 rwing;
-	rwing.x = center.x + (1 * boidSize);
-	rwing.y = center.y + (-1 * boidSize);
+	vector2 rWing;
+	rWing.x = (cos(r) - sin(r) + center.x) * boidSize;
+	rWing.y = (-sin(r) - cos(r) + center.y) * boidSize;
 
 	vector2 tail;
-	tail.x = center.x;
-	tail.y = center.y + (-0.5 * boidSize);
+	tail.x = (-0.5 * sin(r) + center.x) * boidSize;
+	tail.y = (-0.5 * cos(r) + center.y) * boidSize;
 
-	//set new positions and color into the vertecies
-	SDL_Vertex vface = { {face.x,face.y} , {boid.color.r, boid.color.g, boid.color.b, 255}, {1, 1} };
-	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n",face.x,face.y, boid.color.r, boid.color.g, boid.color.b);
-	SDL_Vertex vlWing = { {lwing.x,lwing.y}, {boid.color.r,boid.color.g,boid.color.b, 255}, {1,1} };
-	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", lwing.x, lwing.y, boid.color.r, boid.color.g, boid.color.b);
-	SDL_Vertex vrWing = { {rwing.x,rwing.y }, { boid.color.r, boid.color.g, boid.color.b, 255 }, { 1, 1 } };
-	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", rwing.x, rwing.y, boid.color.r, boid.color.g, boid.color.b);
-	SDL_Vertex vtail = { {tail.x,tail.y }, { boid.color.r, boid.color.g, boid.color.b, 255 }, { 1, 1 } };
-	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", tail.x, tail.y, boid.color.r, boid.color.g, boid.color.b);
-
-	//set boid shape to SDL_Vertex variables
-	/*boid.shape.face = vface;
-	boid.shape.lWing = vlWing;
-	boid.shape.rWing = vrWing;
-	boid.shape.tail = vtail;*/
+	//set boid shape to proper variables
+	boid[i].shape.face = face;
+	boid[i].shape.lWing = lWing;
+	boid[i].shape.rWing = rWing;
+	boid[i].shape.tail = tail;
 }
 
 //Setup window and it's parameters
@@ -189,25 +177,28 @@ void render() {
 	//Loop through every boid
 	for (int i = 0; i < numBoids; i++) {
 		//Calculate boid shape vertecies from position and rotation
-		calcVertecies(boids[i], 0);
+		calcVertecies(boids, i, 0);
 
-		//Put boid shape vertecies into array (left)
-		SDL_Vertex lVertices[] = {
+		//set vertecies
+		SDL_Vertex vface = {{boids[i].shape.face.x,boids[i].shape.face.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1}};
+		SDL_Vertex vlWing = { {boids[i].shape.lWing.x,boids[i].shape.lWing.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1} };
+		SDL_Vertex vrWing = { {boids[i].shape.rWing.x,boids[i].shape.rWing.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1} };
+		SDL_Vertex vtail = { {boids[i].shape.tail.x,boids[i].shape.tail.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1} };
+
+		//Put boid shape vertecies into array
+		SDL_Vertex vertices[] = {
 			vface,
 			vlWing,
 			vtail,
-		};
-
-		//Put boid shape vertecies into array (right side)
-		SDL_Vertex rVertices[] = {
-			vface,
-			vrWing,
-			vrWing,
+			vrWing
 		};
 
 		//Render boid
-		SDL_RenderGeometry(renderer, NULL, lVertices, 3, NULL, 0);
-		SDL_RenderGeometry(renderer, NULL, rVertices, 3, NULL, 0);
+		const int indices[] = {
+		   0,1,2,
+		   2,3,0
+		};
+		SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
 
 	}
 

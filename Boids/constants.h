@@ -9,7 +9,7 @@
 
 #define numBoids 1
 
-#define boidSize 4
+#define boidSize 8
 
 //structure that holds color data
 typedef struct {
@@ -26,10 +26,10 @@ typedef struct {
 
 //structure that holds boid vertex data
 typedef struct {
-	SDL_Vertex face;
-	SDL_Vertex lWing;
-	SDL_Vertex rWing;
-	SDL_Vertex tail;
+	vector2 face;
+	vector2 lWing;
+	vector2 rWing;
+	vector2 tail;
 }shape;
 
 typedef struct {
