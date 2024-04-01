@@ -14,6 +14,11 @@ int lastFrameTime = 0;
 
 boid boids[numBoids];
 
+SDL_Vertex vface = { {300,250}, {255,255,255,255}, {1,1} };
+SDL_Vertex vlWing = { {250,300}, {255,255,255,255}, {1,1} };
+SDL_Vertex vrWing = { {350,300}, {255,255,255,255}, {1,1} };
+SDL_Vertex vtail = { {300,275}, {255,255,255,255}, {1,1} };
+
 void calcVertecies(boid boid, float r) {
 	//position variables
 	vector2 center = boid.pos;
@@ -45,10 +50,10 @@ void calcVertecies(boid boid, float r) {
 	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", tail.x, tail.y, boid.color.r, boid.color.g, boid.color.b);
 
 	//set boid shape to SDL_Vertex variables
-	boid.shape.face = vface;
+	/*boid.shape.face = vface;
 	boid.shape.lWing = vlWing;
 	boid.shape.rWing = vrWing;
-	boid.shape.tail = vtail;
+	boid.shape.tail = vtail;*/
 }
 
 //Setup window and it's parameters
@@ -186,16 +191,24 @@ void render() {
 		//Calculate boid shape vertecies from position and rotation
 		calcVertecies(boids[i], 0);
 
-		//Put boid shape vertecies into array
-		SDL_Vertex vertices[] = {
-			boids[i].shape.face,
-			boids[i].shape.lWing,
-			//boids[i].shape.tail,
-			boids[i].shape.rWing,
+		//Put boid shape vertecies into array (left)
+		SDL_Vertex lVertices[] = {
+			vface,
+			vlWing,
+			vtail,
+		};
+
+		//Put boid shape vertecies into array (right side)
+		SDL_Vertex rVertices[] = {
+			vface,
+			vrWing,
+			vrWing,
 		};
 
 		//Render boid
-		SDL_RenderGeometry(renderer, NULL, vertices, 3, NULL, 0);
+		SDL_RenderGeometry(renderer, NULL, lVertices, 3, NULL, 0);
+		SDL_RenderGeometry(renderer, NULL, rVertices, 3, NULL, 0);
+
 	}
 
 	//Swap buffer frame for current frame (Draws frame)
@@ -216,6 +229,8 @@ int main(int argc, char* argv[]) {
 
 	//Get fullscreen size
 	//SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
+
+	//calcVertecies(boids[0], 0);
 
 	//Set isRunning variable to true
 	int isRunning = initializeWindow();

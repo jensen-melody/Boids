@@ -4,10 +4,10 @@
 #define windowWidth 960
 #define windowHeight 540
 
-#define FPS 0.5
+#define FPS 30
 #define targetFrameTime (1000/FPS)
 
-#define numBoids 1000
+#define numBoids 1
 
 #define boidSize 4
 
