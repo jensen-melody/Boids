@@ -12,22 +12,44 @@ SDL_Renderer* renderer = NULL;
 int isRunning = false;
 int lastFrameTime = 0;
 
-SDL_Vertex vertex_1 = { {400, 50}, {255, 0, 0, 255}, {1, 1} };
-SDL_Vertex vertex_2 = { {200, 300}, {255, 0, 0, 255}, {1, 1} };
-SDL_Vertex vertex_3 = { {600, 300}, {255, 0, 0, 255}, {1, 1} };
+boid boids[numBoids];
 
-//boid structure for placing boids
-struct boid {
-	float x;
-	float y;
-	float dx;
-	float dy;
-	int width;
-	int height;
-	int r;
-	int g;
-	int b;
-}boids[numBoids];
+void calcVertecies(boid boid, float r) {
+	//position variables
+	vector2 center = boid.pos;
+
+	vector2 face;
+	face.x = center.x;
+	face.y = center.y + (1 * boidSize); \
+
+		vector2 lwing;
+	lwing.x = center.x + (-1 * boidSize);
+	lwing.y = center.y + (-1 * boidSize);
+
+	vector2 rwing;
+	rwing.x = center.x + (1 * boidSize);
+	rwing.y = center.y + (-1 * boidSize);
+
+	vector2 tail;
+	tail.x = center.x;
+	tail.y = center.y + (-0.5 * boidSize);
+
+	//set new positions and color into the vertecies
+	SDL_Vertex vface = { {face.x,face.y} , {boid.color.r, boid.color.g, boid.color.b, 255}, {1, 1} };
+	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n",face.x,face.y, boid.color.r, boid.color.g, boid.color.b);
+	SDL_Vertex vlWing = { {lwing.x,lwing.y}, {boid.color.r,boid.color.g,boid.color.b, 255}, {1,1} };
+	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", lwing.x, lwing.y, boid.color.r, boid.color.g, boid.color.b);
+	SDL_Vertex vrWing = { {rwing.x,rwing.y }, { boid.color.r, boid.color.g, boid.color.b, 255 }, { 1, 1 } };
+	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", rwing.x, rwing.y, boid.color.r, boid.color.g, boid.color.b);
+	SDL_Vertex vtail = { {tail.x,tail.y }, { boid.color.r, boid.color.g, boid.color.b, 255 }, { 1, 1 } };
+	printf("{{%f,%f} , {%i,%i,%i} , {1,1}}\n", tail.x, tail.y, boid.color.r, boid.color.g, boid.color.b);
+
+	//set boid shape to SDL_Vertex variables
+	boid.shape.face = vface;
+	boid.shape.lWing = vlWing;
+	boid.shape.rWing = vrWing;
+	boid.shape.tail = vtail;
+}
 
 //Setup window and it's parameters
 int initializeWindow(void) {
@@ -69,26 +91,28 @@ int initializeWindow(void) {
 void setup() {
 	//TODO: Setup
 
-	/*
 	//Sets boid variables
 	for (int i = 0; i < numBoids; i++) {
-		boids[i].width = 10;
-		boids[i].height = 10;
-		boids[i].x = rand() % (windowWidth - boids[i].width);
-		boids[i].y = rand() % (windowHeight - boids[i].height);
-		boids[i].dx = (((rand() % 40) + 20) / 10);
+		/*boids[i].pos.x = rand() % (windowWidth);
+		boids[i].pos.y = rand() % (windowHeight);
+		boids[i].vel.x = (((rand() % 40) + 20) / 10);
 		if (rand() % 2 == 1) {
-			boids[i].dx *= -1;
+			boids[i].vel.x *= -1;
 		}
-		boids[i].dy = ((rand() % 40) + 20) / 10;
-		boids[i].r = 255;
-		boids[i].g = 255;
-		boids[i].b = 255;
+		boids[i].vel.y = ((rand() % 40) + 20) / 10;
+		boids[i].color.r = 255;
+		boids[i].color.g = 255;
+		boids[i].color.b = 255;
 		if (rand() % 2 == 0) {
-			boids[i].dy *= -1;
-		}
+			boids[i].vel.y *= -1;
+		}*/
+		boids[0].pos.x = windowWidth / 2;
+		boids[0].pos.y = windowHeight / 2;
+
+		boids[0].color.r = 255;
+		boids[0].color.g = 255;
+		boids[0].color.b = 255;
 	}
-	*/
 }
 
 //Takes and processes inputs
@@ -157,15 +181,22 @@ void render() {
 	//Clear Screen
 	SDL_RenderClear(renderer);
 
-	// Put them into array
-	SDL_Vertex vertices[] = {
-		vertex_1,
-		vertex_2,
-		vertex_3
-	};
+	//Loop through every boid
+	for (int i = 0; i < numBoids; i++) {
+		//Calculate boid shape vertecies from position and rotation
+		calcVertecies(boids[i], 0);
 
-	// Render red triangle
-	SDL_RenderGeometry(renderer,NULL, vertices, 3, NULL, 0);
+		//Put boid shape vertecies into array
+		SDL_Vertex vertices[] = {
+			boids[i].shape.face,
+			boids[i].shape.lWing,
+			//boids[i].shape.tail,
+			boids[i].shape.rWing,
+		};
+
+		//Render boid
+		SDL_RenderGeometry(renderer, NULL, vertices, 3, NULL, 0);
+	}
 
 	//Swap buffer frame for current frame (Draws frame)
 	SDL_RenderPresent(renderer);
