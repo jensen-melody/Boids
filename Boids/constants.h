@@ -1,8 +1,8 @@
 #define false 0
 #define true 1
 
-#define defaultWindowWidth 960
-#define defaultWindowHeight 540
+#define defaultWindowWidth 1920
+#define defaultWindowHeight 1080
 
 #define FPS 30
 #define targetFrameTime (1000/FPS)

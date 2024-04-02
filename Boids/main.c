@@ -20,8 +20,6 @@ int windowHeight = defaultWindowHeight;
 
 boid boids[numBoids];
 
-float r = 0;
-
 void calcVertecies(boid boid[], int i) {
 	//get center variables
 	vector2 center = boid[i].pos;
@@ -29,18 +27,22 @@ void calcVertecies(boid boid[], int i) {
 	//Get r from velocity
 	float r = -atan2(boid[i].vel.y,boid[i].vel.x) + 1.571;
 
+	//Get head position
 	vector2 head;
 	head.x = boidSize * sin(r) + center.x;
 	head.y = boidSize * cos(r) + center.y;
 
+	//Get left wing position
 	vector2 lWing;
 	lWing.x = -boidSize * cos(r) - boidSize * sin(r) + center.x;
 	lWing.y = boidSize * sin(r) - boidSize * cos(r) + center.y;
 
+	//Get right wing position
 	vector2 rWing;
 	rWing.x = boidSize * cos(r) - boidSize * sin(r) + center.x;
 	rWing.y = -boidSize * sin(r) - boidSize * cos(r) + center.y;
 
+	//Get trail position
 	vector2 tail;
 	tail.x = -0.5 * boidSize * sin(r) + center.x;
 	tail.y = -0.5 * boidSize * cos(r) + center.y;
@@ -73,7 +75,7 @@ int initializeWindow(void) {
 	//Set window to fullscreen
 	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-	//Get fullscreen size and set windowwidth/height to it
+	//Get fullscreen size and set windowWidth/Height to it
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	windowWidth = DM.w;
@@ -99,8 +101,6 @@ int initializeWindow(void) {
 
 //Sets up the scene
 void setup() {
-	//TODO: Setup
-
 	//Sets boid variables
 	for (int i = 0; i < numBoids; i++) {
 		//random pos
@@ -135,14 +135,13 @@ int processInput() {
 	//Check if certain keys are pressed
 	switch (event.type) {
 		//If Exit, Alt+F4, or Win button is pressed
-		case SDL_QUIT: 
-			printf("Quit");
+		case SDL_QUIT:
 			return false;
 			break;
-		//If X is pressed
+		//If key is pressed
 		case SDL_KEYDOWN:
+			//If key pressed is Esc
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
-				printf("Esc");
 				return false;
 			}
 			break;
@@ -152,7 +151,7 @@ int processInput() {
 
 //Update objects every frame
 void update() {
-	//Fixed FPS stuff
+	//Wait an amount of time until target FPS reached
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
 
@@ -234,9 +233,6 @@ void destroyWindow() {
 int main(int argc, char* argv[]) {
 	//Initialize RNG
 	srand(time(NULL));
-
-	//Get fullscreen size
-	//SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
 
 	//Set isRunning variable to true
 	int isRunning = initializeWindow();
