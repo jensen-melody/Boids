@@ -16,12 +16,12 @@ boid boids[numBoids];
 
 float r = 0;
 
-void calcVertecies(boid boid[], int i, float r) {
+void calcVertecies(boid boid[], int i) {
 	//get center variables
 	vector2 center = boid[i].pos;
 
 	//Get r from velocity
-	r = r;
+	float r = atan(boid[i].vel.y/boid[i].vel.x);
 
 	vector2 head;
 	head.x = boidSize * sin(r) + center.x;
@@ -88,7 +88,7 @@ void setup() {
 
 	//Sets boid variables
 	for (int i = 0; i < numBoids; i++) {
-		/*boids[i].pos.x = rand() % (windowWidth);
+		boids[i].pos.x = rand() % (windowWidth);
 		boids[i].pos.y = rand() % (windowHeight);
 		boids[i].vel.x = (((rand() % 40) + 20) / 10);
 		if (rand() % 2 == 1) {
@@ -100,13 +100,7 @@ void setup() {
 		boids[i].color.b = 255;
 		if (rand() % 2 == 0) {
 			boids[i].vel.y *= -1;
-		}*/
-		boids[0].pos.x = windowWidth / 2;
-		boids[0].pos.y = windowHeight / 2;
-
-		boids[0].color.r = 255;
-		boids[0].color.g = 255;
-		boids[0].color.b = 255;
+		}
 	}
 }
 
@@ -140,35 +134,23 @@ void update() {
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
 
-	/*
-	//Do calculations for boid velocities
+	//check if beyond wall
 	for (int i = 0; i < numBoids; i++) {
-		//If boid hits side edges
-		if (boids[i].x < 0 || boids[i].x >(windowWidth - boids[i].width)) {
-			boids[i].dx *= -1;
-			boids[i].r = rand() % 256;
-			boids[i].g = rand() % 256;
-			boids[i].b = rand() % 256;
+		//if beyond horizontal wall
+		if (boids[i].pos.x <= 0 - sqrt(pow(boidSize, 2) * 2) || boids[i].pos.x >= windowWidth + sqrt(pow(boidSize, 2) * 2)) {
+			boids[i].pos.x += -windowWidth;
 		}
 
-		//If boid hits side edges
-		if (boids[i].y < 0 || boids[i].y >(windowHeight - boids[i].height)) {
-			boids[i].dy *= -1;
-			boids[i].r = rand() % 256;
-			boids[i].g = rand() % 256;
-			boids[i].b = rand() % 256;
+		//if beyond vertical wall
+		if (boids[i].pos.y <= 0 - sqrt(pow(boidSize, 2) * 2) || boids[i].pos.y >= windowHeight + sqrt(pow(boidSize, 2) * 2)) {
+			boids[i].pos.y += -windowHeight;
 		}
 	}
-
-	//Update boids pos
+	
+	//Update boid position
 	for (int i = 0; i < numBoids; i++) {
-		boids[i].x += boids[i].dx;
-		boids[i].y += boids[i].dy;
-	}
-	*/
-	r += 0.1;
-	if (r >= 6.2832) {
-		r = 0;
+		boids[i].pos.x += boids[i].vel.x;
+		boids[i].pos.y += boids[i].vel.y;
 	}
 }
 

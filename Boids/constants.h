@@ -7,9 +7,9 @@
 #define FPS 30
 #define targetFrameTime (1000/FPS)
 
-#define numBoids 1
+#define numBoids 20
 
-#define boidSize 50
+#define boidSize 8
 
 //structure that holds color data
 typedef struct {
