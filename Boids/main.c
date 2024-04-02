@@ -88,16 +88,23 @@ void setup() {
 
 	//Sets boid variables
 	for (int i = 0; i < numBoids; i++) {
+		//random pos
 		boids[i].pos.x = rand() % (windowWidth);
 		boids[i].pos.y = rand() % (windowHeight);
-		boids[i].vel.x = (((rand() % 40) + 20) / 10);
+
+		//random velocity
+		boids[i].vel.x = (((rand() % 60) + 5) / 10);
 		if (rand() % 2 == 1) {
 			boids[i].vel.x *= -1;
 		}
-		boids[i].vel.y = ((rand() % 40) + 20) / 10;
+		boids[i].vel.y = (((rand() % 60) + 5) / 10);
+		
+		//color :D
 		boids[i].color.r = 255;
 		boids[i].color.g = 255;
 		boids[i].color.b = 255;
+
+		//give computer some time to get a new seed for random velocity for y
 		if (rand() % 2 == 0) {
 			boids[i].vel.y *= -1;
 		}
