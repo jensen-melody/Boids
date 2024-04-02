@@ -1,3 +1,6 @@
+//Boid algorithms developed by Craig Reynolds, adapted by V. Hunter Adams
+//https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
+
 #include <stdio.h>
 #include <SDL.h>
 #include <time.h>
@@ -11,6 +14,9 @@ SDL_Renderer* renderer = NULL;
 
 int isRunning = false;
 int lastFrameTime = 0;
+
+int windowWidth = defaultWindowWidth;
+int windowHeight = defaultWindowHeight;
 
 boid boids[numBoids];
 
@@ -59,10 +65,19 @@ int initializeWindow(void) {
 		"Boids", //Window Title
 		SDL_WINDOWPOS_CENTERED, //Xpos
 		SDL_WINDOWPOS_CENTERED, //Ypos
-		windowWidth, //Width
-		windowHeight, //Height
+		defaultWindowWidth, //Width
+		defaultWindowHeight, //Height
 		SDL_WINDOW_ALLOW_HIGHDPI //Flags
 	);
+
+	//Set window to fullscreen
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+	//Get fullscreen size and set windowwidth/height to it
+	SDL_DisplayMode DM;
+	SDL_GetCurrentDisplayMode(0, &DM);
+	windowWidth = DM.w;
+	windowHeight = DM.h;
 
 	//Checks if window initialized correctly
 	if (!window) {
