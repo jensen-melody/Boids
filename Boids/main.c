@@ -14,6 +14,8 @@ int lastFrameTime = 0;
 
 boid boids[numBoids];
 
+float r = 0;
+
 void calcVertecies(boid boid[], int i, float r) {
 	//get center variables
 	vector2 center = boid[i].pos;
@@ -21,24 +23,24 @@ void calcVertecies(boid boid[], int i, float r) {
 	//Get r from velocity
 	r = r;
 
-	vector2 face;
-	face.x = (sin(r) + center.x) * boidSize;
-	face.y = (cos(r) + center.y) * boidSize;
+	vector2 head;
+	head.x = boidSize * sin(r) + center.x;
+	head.y = boidSize * cos(r) + center.y;
 
 	vector2 lWing;
-	lWing.x = (-cos(r) - sin(r) + center.x) * boidSize;
-	lWing.y = (sin(r) - cos(r) + center.y) * boidSize;
+	lWing.x = -boidSize * cos(r) - boidSize * sin(r) + center.x;
+	lWing.y = boidSize * sin(r) - boidSize * cos(r) + center.y;
 
 	vector2 rWing;
-	rWing.x = (cos(r) - sin(r) + center.x) * boidSize;
-	rWing.y = (-sin(r) - cos(r) + center.y) * boidSize;
+	rWing.x = boidSize * cos(r) - boidSize * sin(r) + center.x;
+	rWing.y = -boidSize * sin(r) - boidSize * cos(r) + center.y;
 
 	vector2 tail;
-	tail.x = (-0.5 * sin(r) + center.x) * boidSize;
-	tail.y = (-0.5 * cos(r) + center.y) * boidSize;
+	tail.x = -0.5 * boidSize * sin(r) + center.x;
+	tail.y = -0.5 * boidSize * cos(r) + center.y;
 
 	//set boid shape to proper variables
-	boid[i].shape.face = face;
+	boid[i].shape.head = head;
 	boid[i].shape.lWing = lWing;
 	boid[i].shape.rWing = rWing;
 	boid[i].shape.tail = tail;
@@ -164,6 +166,10 @@ void update() {
 		boids[i].y += boids[i].dy;
 	}
 	*/
+	r += 0.1;
+	if (r >= 6.2832) {
+		r = 0;
+	}
 }
 
 //Tell renderer to show objects on screen
@@ -177,17 +183,17 @@ void render() {
 	//Loop through every boid
 	for (int i = 0; i < numBoids; i++) {
 		//Calculate boid shape vertecies from position and rotation
-		calcVertecies(boids, i, 0);
+		calcVertecies(boids, i, r);
 
 		//set vertecies
-		SDL_Vertex vface = {{boids[i].shape.face.x,boids[i].shape.face.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1}};
+		SDL_Vertex vhead = {{boids[i].shape.head.x,boids[i].shape.head.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1}};
 		SDL_Vertex vlWing = { {boids[i].shape.lWing.x,boids[i].shape.lWing.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1} };
 		SDL_Vertex vrWing = { {boids[i].shape.rWing.x,boids[i].shape.rWing.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1} };
 		SDL_Vertex vtail = { {boids[i].shape.tail.x,boids[i].shape.tail.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1} };
 
 		//Put boid shape vertecies into array
 		SDL_Vertex vertices[] = {
-			vface,
+			vhead,
 			vlWing,
 			vtail,
 			vrWing

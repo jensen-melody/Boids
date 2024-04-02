@@ -9,7 +9,7 @@
 
 #define numBoids 1
 
-#define boidSize 8
+#define boidSize 50
 
 //structure that holds color data
 typedef struct {
@@ -26,12 +26,13 @@ typedef struct {
 
 //structure that holds boid vertex data
 typedef struct {
-	vector2 face;
+	vector2 head;
 	vector2 lWing;
 	vector2 rWing;
 	vector2 tail;
 }shape;
 
+//Boids Structure
 typedef struct {
 	vector2 pos;
 	vector2 vel;
