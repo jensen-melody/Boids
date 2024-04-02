@@ -21,7 +21,7 @@ void calcVertecies(boid boid[], int i) {
 	vector2 center = boid[i].pos;
 
 	//Get r from velocity
-	float r = atan(boid[i].vel.y/boid[i].vel.x);
+	float r = -atan2(boid[i].vel.y,boid[i].vel.x) + 1.571;
 
 	vector2 head;
 	head.x = boidSize * sin(r) + center.x;
@@ -102,6 +102,13 @@ void setup() {
 			boids[i].vel.y *= -1;
 		}
 	}
+	/*boids[0].pos.x = windowWidth / 2;
+	boids[0].pos.y = windowHeight / 2;
+	boids[0].vel.x = 1;
+	boids[0].vel.y = 1;
+	boids[0].color.r = 255;
+	boids[0].color.g = 255;
+	boids[0].color.b = 255;*/
 }
 
 //Takes and processes inputs
@@ -137,14 +144,21 @@ void update() {
 	//check if beyond wall
 	for (int i = 0; i < numBoids; i++) {
 		//if beyond horizontal wall
-		if (boids[i].pos.x <= 0 - sqrt(pow(boidSize, 2) * 2) || boids[i].pos.x >= windowWidth + sqrt(pow(boidSize, 2) * 2)) {
-			boids[i].pos.x += -windowWidth;
+		if (boids[i].pos.x <= 0 - sqrt(pow(boidSize, 2) * 2)) {
+			boids[i].pos.x = windowWidth + sqrt(pow(boidSize, 2) * 2);
+		}
+		else if (boids[i].pos.x >= windowWidth + sqrt(pow(boidSize, 2) * 2)) {
+			boids[i].pos.x = 0 - sqrt(pow(boidSize, 2) * 2);
 		}
 
 		//if beyond vertical wall
-		if (boids[i].pos.y <= 0 - sqrt(pow(boidSize, 2) * 2) || boids[i].pos.y >= windowHeight + sqrt(pow(boidSize, 2) * 2)) {
-			boids[i].pos.y += -windowHeight;
+		if (boids[i].pos.y <= 0 - sqrt(pow(boidSize, 2) * 2)) {
+			boids[i].pos.y = windowHeight + sqrt(pow(boidSize, 2) * 2);
 		}
+		else if (boids[i].pos.y >= windowHeight + sqrt(pow(boidSize, 2) * 2)) {
+			boids[i].pos.y = 0 - sqrt(pow(boidSize, 2) * 2);
+		}
+
 	}
 	
 	//Update boid position
@@ -165,7 +179,7 @@ void render() {
 	//Loop through every boid
 	for (int i = 0; i < numBoids; i++) {
 		//Calculate boid shape vertecies from position and rotation
-		calcVertecies(boids, i, r);
+		calcVertecies(boids, i);
 
 		//set vertecies
 		SDL_Vertex vhead = {{boids[i].shape.head.x,boids[i].shape.head.y}, {boids[i].color.r,boids[i].color.g,boids[i].color.b,255}, {1,1}};
@@ -208,8 +222,6 @@ int main(int argc, char* argv[]) {
 
 	//Get fullscreen size
 	//SDL_GetRendererOutputSize(renderer, &windowWidth, &windowHeight);
-
-	//calcVertecies(boids[0], 0);
 
 	//Set isRunning variable to true
 	int isRunning = initializeWindow();
