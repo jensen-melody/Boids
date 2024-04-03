@@ -4,12 +4,24 @@
 #define defaultWindowWidth 1920
 #define defaultWindowHeight 1080
 
-#define FPS 30
+#define FPS 60
 #define targetFrameTime (1000/FPS)
 
 #define numBoids 200
-
 #define boidSize 8
+
+#define turnFactor 0.3
+#define margin 100
+#define visualRange 120
+#define	protectedRange 24
+#define	centeringFactor 0.0005
+#define	avoidFactor 0.05
+#define	alignFactor 0.05
+#define	maxSpeed 6
+#define	minSpeed 3
+#define	maxBias 0.01
+#define	biasIncrement 0.00004
+#define	biasVal 0.001
 
 //structure that holds color data
 typedef struct {

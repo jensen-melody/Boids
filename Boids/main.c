@@ -20,6 +20,17 @@ int windowHeight = defaultWindowHeight;
 
 boid boids[numBoids];
 
+//Calculate two boids distances
+float dist(boid boid1, boid boid2) {
+	float dx = boid2.pos.x - boid1.pos.x;
+	float dy = boid2.pos.y - boid1.pos.y;
+
+	float distance = sqrt(pow(dx, 2) + pow(dy, 2));
+
+	return distance;
+}
+
+//Calculate the position of vertecies of boids based on their position and velocity
 void calcVertecies(boid boid[], int i) {
 	//get center variables
 	vector2 center = boid[i].pos;
@@ -155,26 +166,136 @@ void update() {
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
 
-	//check if beyond wall
+
+	//Separation
+	vector2 closeBoids;
+
+	//loop through every boid
 	for (int i = 0; i < numBoids; i++) {
-		//if beyond horizontal wall
-		if (boids[i].pos.x <= 0 - sqrt(pow(boidSize, 2) * 2)) {
-			boids[i].pos.x = windowWidth + sqrt(pow(boidSize, 2) * 2);
+		//Zero vars
+		closeBoids.x = 0;
+		closeBoids.y = 0;
+
+		//Loop through ever other boid
+		for (int j = 0; j < numBoids; j++) {
+			if (i != j) {
+				//If other boid is within protected range
+				if (dist(boids[i], boids[j]) < protectedRange) {
+					closeBoids.x += boids[i].pos.x - boids[j].pos.x;
+					closeBoids.y += boids[i].pos.y - boids[j].pos.y;
+				}
+			}
 		}
-		else if (boids[i].pos.x >= windowWidth + sqrt(pow(boidSize, 2) * 2)) {
-			boids[i].pos.x = 0 - sqrt(pow(boidSize, 2) * 2);
+		//Update velocities accordingly
+		boids[i].vel.x += closeBoids.x * avoidFactor;
+		boids[i].vel.y += closeBoids.y * avoidFactor;
+	}
+
+
+	//Alignment
+	vector2 avgVel;
+	int neighboringBoids;
+
+	//loop through every boid
+	for (int i = 0; i < numBoids; i++) {
+		//Zero vars
+		avgVel.x = 0;
+		avgVel.y = 0;
+		neighboringBoids = 0;
+
+		//Loop through ever other boid
+		for (int j = 0; j < numBoids; j++) {
+			if (i != j) {
+				//If other boid distance is within visual range
+				if (dist(boids[i], boids[j]) < visualRange) {
+					avgVel.x += boids[j].vel.x;
+					avgVel.y += boids[j].vel.y;
+					neighboringBoids++;
+				}
+			}
 		}
 
-		//if beyond vertical wall
-		if (boids[i].pos.y <= 0 - sqrt(pow(boidSize, 2) * 2)) {
-			boids[i].pos.y = windowHeight + sqrt(pow(boidSize, 2) * 2);
-		}
-		else if (boids[i].pos.y >= windowHeight + sqrt(pow(boidSize, 2) * 2)) {
-			boids[i].pos.y = 0 - sqrt(pow(boidSize, 2) * 2);
+		//Average Velocities
+		if (neighboringBoids > 0) {
+			avgVel.x = avgVel.x / neighboringBoids;
+			avgVel.y = avgVel.y / neighboringBoids;
 		}
 
+		//Update velocities accordingly
+		boids[i].vel.x += (avgVel.x - boids[i].vel.x) * alignFactor;
+		boids[i].vel.y += (avgVel.y - boids[i].vel.y) * alignFactor;
+	}
+
+	//Cohesion
+	vector2 avgPos;
+
+	//loop through every boid
+	for (int i = 0; i < numBoids; i++) {
+		//Zero vars
+		avgPos.x = 0;
+		avgPos.y = 0;
+		neighboringBoids = 0;
+
+		//Loop through ever other boid
+		for (int j = 0; j < numBoids; j++) {
+			if (i != j) {
+				//If other boid distance is within visual range
+				if (dist(boids[i], boids[j]) < visualRange) {
+					avgPos.x += boids[j].pos.x;
+					avgPos.y += boids[j].pos.y;
+					neighboringBoids++;
+				}
+			}
+		}
+
+		//Average Velocities
+		if (neighboringBoids > 0) {
+			avgPos.x = avgPos.x / neighboringBoids;
+			avgPos.y = avgPos.y / neighboringBoids;
+		}
+
+		//Update velocities accordingly
+		boids[i].vel.x += (avgPos.x - boids[i].pos.x) * centeringFactor;
+		boids[i].vel.y += (avgPos.y - boids[i].pos.y) * centeringFactor;
+	}
+
+
+	//Edge maneuvering
+	for (int i = 0; i < numBoids; i++) {
+		if (boids[i].pos.x < margin) {
+			boids[i].vel.x += turnFactor;
+		}
+		if (boids[i].pos.x > windowWidth - margin) {
+			boids[i].vel.x -= turnFactor;
+		}
+		if (boids[i].pos.y < margin) {
+			boids[i].vel.y += turnFactor;
+		}
+		if (boids[i].pos.y > windowHeight - margin) {
+			boids[i].vel.y -= turnFactor;
+		}
+	}
+
+
+	//Clamp Speed
+	for (int i = 0; i < numBoids; i++) {
+		//Calc speed
+		float speed = sqrt(pow(boids[i].vel.x, 2) + pow(boids[i].vel.y, 2));
+
+		//If too fast
+		if (speed > maxSpeed) {
+			boids[i].vel.x = (boids[i].vel.x / speed) * maxSpeed;
+			boids[i].vel.y = (boids[i].vel.y / speed) * maxSpeed;
+		}
+
+		//If too slow
+		if (speed < minSpeed) {
+			boids[i].vel.x = (boids[i].vel.x / speed) * minSpeed;
+			boids[i].vel.y = (boids[i].vel.y / speed) * minSpeed;
+		}
 	}
 	
+
 	//Update boid position
 	for (int i = 0; i < numBoids; i++) {
 		boids[i].pos.x += boids[i].vel.x;
