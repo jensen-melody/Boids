@@ -1,5 +1,6 @@
 //Boid algorithms developed by Craig Reynolds, adapted by V. Hunter Adams
 //https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
+//I love undertime sloppe
 
 #include <stdio.h>
 #include <SDL.h>
