@@ -7,7 +7,7 @@
 #define FPS 30
 #define targetFrameTime (1000/FPS)
 
-#define numBoids 2000
+#define numBoids 200
 
 #define boidSize 8
 
