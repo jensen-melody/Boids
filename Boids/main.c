@@ -1,9 +1,9 @@
 //Boid algorithms developed by Craig Reynolds, adapted by V. Hunter Adams
 //https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
-//I love undertime sloppe
 
 #include <stdio.h>
 #include <SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
@@ -146,7 +146,7 @@ int processInput() {
 
 	//Check if certain keys are pressed
 	switch (event.type) {
-		//If Exit, Alt+F4, or Win button is pressed
+		//If Exit or Alt+F4 button is pressed
 		case SDL_QUIT:
 			return false;
 			break;
@@ -155,6 +155,10 @@ int processInput() {
 			//If key pressed is Esc
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
 				return false;
+			}
+			//If key pressed is R
+			if (event.key.keysym.sym == SDLK_r) {
+				setup();
 			}
 			break;
 
@@ -170,12 +174,20 @@ void update() {
 
 	//Separation
 	vector2 closeBoids;
+	vector2 avgVel;
+	vector2 avgPos;
+	int neighboringBoids;
 
 	//loop through every boid
 	for (int i = 0; i < numBoids; i++) {
 		//Zero vars
 		closeBoids.x = 0;
 		closeBoids.y = 0;
+		avgVel.x = 0;
+		avgVel.y = 0;
+		neighboringBoids = 0;
+		avgPos.x = 0;
+		avgPos.y = 0;
 
 		//Loop through ever other boid
 		for (int j = 0; j < numBoids; j++) {
@@ -185,81 +197,32 @@ void update() {
 					closeBoids.x += boids[i].pos.x - boids[j].pos.x;
 					closeBoids.y += boids[i].pos.y - boids[j].pos.y;
 				}
-			}
-		}
-		//Update velocities accordingly
-		boids[i].vel.x += closeBoids.x * avoidFactor;
-		boids[i].vel.y += closeBoids.y * avoidFactor;
-	}
-
-
-	//Alignment
-	vector2 avgVel;
-	int neighboringBoids;
-
-	//loop through every boid
-	for (int i = 0; i < numBoids; i++) {
-		//Zero vars
-		avgVel.x = 0;
-		avgVel.y = 0;
-		neighboringBoids = 0;
-
-		//Loop through ever other boid
-		for (int j = 0; j < numBoids; j++) {
-			if (i != j) {
 				//If other boid distance is within visual range
 				if (dist(boids[i], boids[j]) < visualRange) {
 					avgVel.x += boids[j].vel.x;
 					avgVel.y += boids[j].vel.y;
-					neighboringBoids++;
-				}
-			}
-		}
-
-		//Average Velocities
-		if (neighboringBoids > 0) {
-			avgVel.x = avgVel.x / neighboringBoids;
-			avgVel.y = avgVel.y / neighboringBoids;
-		}
-
-		//Update velocities accordingly
-		boids[i].vel.x += (avgVel.x - boids[i].vel.x) * alignFactor;
-		boids[i].vel.y += (avgVel.y - boids[i].vel.y) * alignFactor;
-	}
-
-	//Cohesion
-	vector2 avgPos;
-
-	//loop through every boid
-	for (int i = 0; i < numBoids; i++) {
-		//Zero vars
-		avgPos.x = 0;
-		avgPos.y = 0;
-		neighboringBoids = 0;
-
-		//Loop through ever other boid
-		for (int j = 0; j < numBoids; j++) {
-			if (i != j) {
-				//If other boid distance is within visual range
-				if (dist(boids[i], boids[j]) < visualRange) {
 					avgPos.x += boids[j].pos.x;
 					avgPos.y += boids[j].pos.y;
 					neighboringBoids++;
 				}
 			}
 		}
-
-		//Average Velocities
+		//Average Velocities/Positions
 		if (neighboringBoids > 0) {
+			avgVel.x = avgVel.x / neighboringBoids;
+			avgVel.y = avgVel.y / neighboringBoids;
 			avgPos.x = avgPos.x / neighboringBoids;
 			avgPos.y = avgPos.y / neighboringBoids;
 		}
 
 		//Update velocities accordingly
+		boids[i].vel.x += closeBoids.x * avoidFactor;
+		boids[i].vel.y += closeBoids.y * avoidFactor;
+		boids[i].vel.x += (avgVel.x - boids[i].vel.x) * alignFactor;
+		boids[i].vel.y += (avgVel.y - boids[i].vel.y) * alignFactor;
 		boids[i].vel.x += (avgPos.x - boids[i].pos.x) * centeringFactor;
 		boids[i].vel.y += (avgPos.y - boids[i].pos.y) * centeringFactor;
 	}
-
 
 	//Edge maneuvering
 	for (int i = 0; i < numBoids; i++) {
@@ -311,6 +274,32 @@ void render() {
 
 	//Clear Screen
 	SDL_RenderClear(renderer);
+
+	////Set font
+	//TTF_Font* Sans = TTF_OpenFont("Sans.ttf", 24);
+
+	////Set color to white
+	//SDL_Color White = { 255, 255, 255 };
+
+	////Render Text
+	//SDL_Surface* surfaceMessage =
+	//	TTF_RenderText_Solid(Sans, "Press R to Reset", White);
+
+	//// now you can convert it into a texture
+	//SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+
+	//SDL_Rect Message_rect; //create a rect
+	//Message_rect.x = 0;  //controls the rect's x coordinate 
+	//Message_rect.y = 0; // controls the rect's y coordinte
+	//Message_rect.w = 100; // controls the width of the rect
+	//Message_rect.h = 100; // controls the height of the rect
+
+	//// and coordinate of your texture
+	//SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
+
+	//// Don't forget to free your surface and texture
+	//SDL_FreeSurface(surfaceMessage);
+	//SDL_DestroyTexture(Message);
 
 	//Loop through every boid
 	for (int i = 0; i < numBoids; i++) {

@@ -7,7 +7,7 @@
 #define FPS 60
 #define targetFrameTime (1000/FPS)
 
-#define numBoids 200
+#define numBoids 300
 #define boidSize 8
 
 #define turnFactor 0.3

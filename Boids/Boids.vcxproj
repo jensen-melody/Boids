@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Program Files\SDL2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\SDL2_ttf\i686-w64-mingw32\include;C:\Program Files\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\SDL2_ttf\i686-w64-mingw32\lib;C:\Program Files\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,7 +112,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\SDL2_ttf\i686-w64-mingw32\lib;C:\Program Files\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,10 +136,12 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\Program Files\SDL2_ttf\i686-w64-mingw32\include\SDL2\SDL_ttf.h" />
     <ClInclude Include="constants.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\..\..\Program Files\SDL2\lib\x64\SDL2.dll" />
+    <None Include="..\..\..\..\..\..\Program Files\SDL2_ttf\x86_64-w64-mingw32\bin\SDL2_ttf.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
