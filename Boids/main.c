@@ -19,6 +19,9 @@ int lastFrameTime = 0;
 int windowWidth = defaultWindowWidth;
 int windowHeight = defaultWindowHeight;
 
+color bgColor;
+float h = 0;
+
 boid boids[numBoids];
 
 //Calculate two boids distances
@@ -29,6 +32,63 @@ float dist(boid boid1, boid boid2) {
 	float distance = sqrt(pow(dx, 2) + pow(dy, 2));
 
 	return distance;
+}
+
+color hsv(float H, float S, float V) {
+	//Make define vars
+	color out;
+	float r = 0;
+	float g = 0;
+	float b = 0;
+
+	//Set H, S, and V to their respective values
+	H *= 24;
+	H /= 17;
+	S /= 255;
+	V /= 255;
+	
+	//Set other vars
+	float C = V * S;
+	float X = 1 - abs((fmod(H/60,2)-1));
+	float M = V - C;
+
+	//Calc the thingies
+	if (H >= 0 && H < 60) {
+		r = C;
+		b = X;
+		g = 0;
+	}
+	else if (H < 120) {
+		r = X;
+		b = C;
+		g = 0;
+	}
+	else if (H < 180) {
+		r = 0;
+		b = C;
+		g = X;
+	}
+	else if (H < 240) {
+		r = 0;
+		b = X;
+		g = C;
+	}
+	else if (H < 300) {
+		r = X;
+		b = 0;
+		g = C;
+	}
+	else if (H < 360) {
+		r = C;
+		b = 0;
+		g = X;
+	}
+
+	out.r = ((r + M) * 255);
+	out.g = ((g + M) * 255);
+	out.b = ((b + M) * 255);
+
+	return out;
 }
 
 //Calculate the position of vertecies of boids based on their position and velocity
@@ -265,41 +325,25 @@ void update() {
 		boids[i].pos.x += boids[i].vel.x;
 		boids[i].pos.y += boids[i].vel.y;
 	}
+
+	//Update boid color;
+	for (int i = 0; i < numBoids; i++) {
+		boids[i].color = hsv(h, 255, 255);
+	}
+	h += 1;
+	if (h >= 360) {
+		h = 0;
+	}
+	printf("%i, %i, %i | %f\n", boids[0].color.r, boids[0].color.g, boids[0].color.b, h);
 }
 
 //Tell renderer to show objects on screen
 void render() {
 	//Draw background
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, 0);
 
 	//Clear Screen
 	SDL_RenderClear(renderer);
-
-	////Set font
-	//TTF_Font* Sans = TTF_OpenFont("Sans.ttf", 24);
-
-	////Set color to white
-	//SDL_Color White = { 255, 255, 255 };
-
-	////Render Text
-	//SDL_Surface* surfaceMessage =
-	//	TTF_RenderText_Solid(Sans, "Press R to Reset", White);
-
-	//// now you can convert it into a texture
-	//SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-
-	//SDL_Rect Message_rect; //create a rect
-	//Message_rect.x = 0;  //controls the rect's x coordinate 
-	//Message_rect.y = 0; // controls the rect's y coordinte
-	//Message_rect.w = 100; // controls the width of the rect
-	//Message_rect.h = 100; // controls the height of the rect
-
-	//// and coordinate of your texture
-	//SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
-
-	//// Don't forget to free your surface and texture
-	//SDL_FreeSurface(surfaceMessage);
-	//SDL_DestroyTexture(Message);
 
 	//Loop through every boid
 	for (int i = 0; i < numBoids; i++) {
@@ -347,6 +391,14 @@ int main(int argc, char* argv[]) {
 
 	//Set isRunning variable to true
 	int isRunning = initializeWindow();
+
+	//Set background color to black
+	bgColor.r = 0;
+	bgColor.g = 0;
+	bgColor.b = 0;
+
+	//Print Controls to console
+	printf("---CONTROLS---\nPress ESC to Quit\nPress R to Reset Simulation\nPress C to Change Colors\n");
 
 	setup();
 
