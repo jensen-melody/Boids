@@ -4,10 +4,10 @@
 #define defaultWindowWidth 1920
 #define defaultWindowHeight 1080
 
-#define FPS 60
+#define FPS 30
 #define targetFrameTime (1000/FPS)
 
-#define numBoids 300
+#define numBoids 200
 #define boidSize 8
 
 #define turnFactor 0.3

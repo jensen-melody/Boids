@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
@@ -14,6 +13,7 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
 int isRunning = false;
+int isDisco = false;
 int lastFrameTime = 0;
 
 int windowWidth = defaultWindowWidth;
@@ -34,6 +34,7 @@ float dist(boid boid1, boid boid2) {
 	return distance;
 }
 
+//Calculate RGB value from HSV
 color hsv(float H, float S, float V) {
 	//Make define vars
 	color out;
@@ -49,7 +50,7 @@ color hsv(float H, float S, float V) {
 	
 	//Set other vars
 	float C = V * S;
-	float X = 1 - abs((fmod(H/60,2)-1));
+	float X = (1 - fabs((fmod(H/60,2)-1))*C);
 	float M = V - C;
 
 	//Calc the thingies
@@ -78,11 +79,13 @@ color hsv(float H, float S, float V) {
 		b = 0;
 		g = C;
 	}
-	else if (H < 360) {
+	else if (H <= 360) {
 		r = C;
 		b = 0;
 		g = X;
 	}
+
+	//printf("%f, %f, %f\n", C, X, H);
 
 	out.r = ((r + M) * 255);
 	out.g = ((g + M) * 255);
@@ -220,6 +223,15 @@ int processInput() {
 			if (event.key.keysym.sym == SDLK_r) {
 				setup();
 			}
+			//If key pressed is D
+			if (event.key.keysym.sym == SDLK_d) {
+				if (isDisco) {
+					isDisco = false;
+				}
+				else {
+					isDisco = true;
+				}
+			}
 			break;
 
 	}
@@ -326,15 +338,17 @@ void update() {
 		boids[i].pos.y += boids[i].vel.y;
 	}
 
-	//Update boid color;
-	for (int i = 0; i < numBoids; i++) {
-		boids[i].color = hsv(h, 255, 255);
+	if (isDisco) {
+		//Update boid color for disco
+		for (int i = 0; i < numBoids; i++) {
+			boids[i].color = hsv(h, 255, 255);
+		}
+		bgColor = hsv(-h+255, 200, 255);
+		h += 60 / FPS;
+		if (h >= 255) {
+			h = 0;
+		}
 	}
-	h += 1;
-	if (h >= 360) {
-		h = 0;
-	}
-	printf("%i, %i, %i | %f\n", boids[0].color.r, boids[0].color.g, boids[0].color.b, h);
 }
 
 //Tell renderer to show objects on screen
