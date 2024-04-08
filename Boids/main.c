@@ -14,6 +14,7 @@ SDL_Renderer* renderer = NULL;
 
 int isRunning = false;
 int isDisco = false;
+int bhMode = 1;
 int lastFrameTime = 0;
 
 int windowWidth = defaultWindowWidth;
@@ -50,7 +51,7 @@ color hsv(float H, float S, float V) {
 	
 	//Set other vars
 	float C = V * S;
-	float X = (1 - fabs((fmod(H/60,2)-1))*C);
+	float X = (1 - fabs((fmod(H/60,2)-1)))*C;
 	float M = V - C;
 
 	//Calc the thingies
@@ -84,8 +85,6 @@ color hsv(float H, float S, float V) {
 		b = 0;
 		g = X;
 	}
-
-	//printf("%f, %f, %f\n", C, X, H);
 
 	out.r = ((r + M) * 255);
 	out.g = ((g + M) * 255);
@@ -194,6 +193,10 @@ void setup() {
 		boids[i].color.g = 255;
 		boids[i].color.b = 255;
 
+		bgColor.r = 0;
+		bgColor.g = 0;
+		bgColor.b = 0;
+
 		//give computer some time to get a new seed for random velocity for y
 		if (rand() % 2 == 0) {
 			boids[i].vel.y *= -1;
@@ -223,6 +226,14 @@ int processInput() {
 			if (event.key.keysym.sym == SDLK_r) {
 				setup();
 			}
+			//If key pressed is C
+			if (event.key.keysym.sym == SDLK_c) {
+				for (int i = 0; i < numBoids; i++) {
+					boids[i].color.r = rand() % 255;
+					boids[i].color.b = rand() % 255;
+					boids[i].color.g = rand() % 255;
+				}
+			}
 			//If key pressed is D
 			if (event.key.keysym.sym == SDLK_d) {
 				if (isDisco) {
@@ -231,6 +242,10 @@ int processInput() {
 				else {
 					isDisco = true;
 				}
+			}
+			//If key pressed is B
+			if (event.key.keysym.sym == SDLK_b) {
+				bhMode *= -1;
 			}
 			break;
 
@@ -288,8 +303,8 @@ void update() {
 		}
 
 		//Update velocities accordingly
-		boids[i].vel.x += closeBoids.x * avoidFactor;
-		boids[i].vel.y += closeBoids.y * avoidFactor;
+		boids[i].vel.x += closeBoids.x * bhMode * avoidFactor;
+		boids[i].vel.y += closeBoids.y * bhMode * avoidFactor;
 		boids[i].vel.x += (avgVel.x - boids[i].vel.x) * alignFactor;
 		boids[i].vel.y += (avgVel.y - boids[i].vel.y) * alignFactor;
 		boids[i].vel.x += (avgPos.x - boids[i].pos.x) * centeringFactor;
@@ -343,7 +358,7 @@ void update() {
 		for (int i = 0; i < numBoids; i++) {
 			boids[i].color = hsv(h, 255, 255);
 		}
-		bgColor = hsv(-h+255, 200, 255);
+		bgColor = hsv(-h+255, 200, 150);
 		h += 60 / FPS;
 		if (h >= 255) {
 			h = 0;
