@@ -116,7 +116,7 @@ void calcVertecies(boid boid[], int i) {
 	rWing.x = boidSize * cos(r) - boidSize * sin(r) + center.x;
 	rWing.y = -boidSize * sin(r) - boidSize * cos(r) + center.y;
 
-	//Get trail position
+	//Get tail position
 	vector2 tail;
 	tail.x = -0.5 * boidSize * sin(r) + center.x;
 	tail.y = -0.5 * boidSize * cos(r) + center.y;
@@ -169,39 +169,38 @@ int initializeWindow(void) {
 		fprintf(stderr, "Error creating SDL Renderer.\n");
 		return false;
 	}
-
-	return true;
 }
 
 //Sets up the scene
 void setup() {
 	//Sets boid variables
 	for (int i = 0; i < numBoids; i++) {
-		//random pos
+		//Random pos
 		boids[i].pos.x = rand() % (windowWidth);
 		boids[i].pos.y = rand() % (windowHeight);
 
-		//random velocity
+		//Random velocity
 		boids[i].vel.x = (((rand() % 60) + 5) / 10);
 		if (rand() % 2 == 1) {
 			boids[i].vel.x *= -1;
 		}
 		boids[i].vel.y = (((rand() % 60) + 5) / 10);
 		
-		//color :D
+		//Color :D
 		boids[i].color.r = 255;
 		boids[i].color.g = 255;
 		boids[i].color.b = 255;
 
-		bgColor.r = 0;
-		bgColor.g = 0;
-		bgColor.b = 0;
-
-		//give computer some time to get a new seed for random velocity for y
+		//Give computer some time to get a new seed for random velocity for y
 		if (rand() % 2 == 0) {
 			boids[i].vel.y *= -1;
 		}
 	}
+
+	//Sets background color to black
+	bgColor.r = 0;
+	bgColor.g = 0;
+	bgColor.b = 0;
 }
 
 //Takes and processes inputs
@@ -258,8 +257,7 @@ void update() {
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
 
-
-	//Separation
+	//Variables for boid behavior
 	vector2 closeBoids;
 	vector2 avgVel;
 	vector2 avgPos;
@@ -311,7 +309,7 @@ void update() {
 		boids[i].vel.y += (avgPos.y - boids[i].pos.y) * centeringFactor;
 	}
 
-	//Edge maneuvering
+	//Edging
 	for (int i = 0; i < numBoids; i++) {
 		if (boids[i].pos.x < margin) {
 			boids[i].vel.x += turnFactor;
@@ -326,7 +324,6 @@ void update() {
 			boids[i].vel.y -= turnFactor;
 		}
 	}
-
 
 	//Clamp Speed
 	for (int i = 0; i < numBoids; i++) {
@@ -345,7 +342,6 @@ void update() {
 			boids[i].vel.y = (boids[i].vel.y / speed) * minSpeed;
 		}
 	}
-	
 
 	//Update boid position
 	for (int i = 0; i < numBoids; i++) {
@@ -353,6 +349,7 @@ void update() {
 		boids[i].pos.y += boids[i].vel.y;
 	}
 
+	//Do disco mode colors
 	if (isDisco) {
 		//Update boid color for disco
 		for (int i = 0; i < numBoids; i++) {
@@ -418,17 +415,13 @@ int main(int argc, char* argv[]) {
 	//Initialize RNG
 	srand(time(NULL));
 
-	//Set isRunning variable to true
+	//Set isRunning variable to if window initizalized
 	int isRunning = initializeWindow();
-
-	//Set background color to black
-	bgColor.r = 0;
-	bgColor.g = 0;
-	bgColor.b = 0;
 
 	//Print Controls to console
 	printf("---CONTROLS---\nPress ESC to Quit\nPress R to Reset Simulation\nPress C to Change Colors\n");
 
+	//Set up scene
 	setup();
 
 	//Main Game Loop
@@ -440,6 +433,6 @@ int main(int argc, char* argv[]) {
 
 	//If isRunning is false, or loop breaks suddenly, destroy the window and uninitialize everything
 	destroyWindow();
-
-	return false;
 }
+
+//Thank you for an amazing year of CompSci Ms. Kant!!!!
